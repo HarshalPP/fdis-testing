@@ -18,7 +18,8 @@ const ALLOWED_UPDATE_ATTRIBUTE = [
   'Password',
   'Module_Id',
   'ImageUrl',
-  'Active'
+  'Active',
+  'Email'
 
 ];
 

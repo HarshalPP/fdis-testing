@@ -347,8 +347,8 @@ const findAll = async (request, response) => {
       where: condition,
       ...option,
       include: [],
-      order: [['User', 'UserName', 'ASC']]
-      // order: [['User.UserName', 'ASC']]
+      // order: [['User', 'UserName', 'ASC']]
+      order: [['User.UserName', 'ASC']]
     });
   
     response.status(200).json(result);
@@ -671,7 +671,7 @@ const rawQueryList = async (request) => {
       
     ],
     order: [
-      ['CompanyName', 'ASC'] // Sort by companyName in ascending order
+      ['User', 'UserName','ASC'] // Sort by companyName in ascending order
     ]
   });
 };

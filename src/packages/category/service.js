@@ -7,6 +7,7 @@ import { commonLocale } from '../../locales'
 import * as userClientModule from '../userClient/index'
 import { CategorySeq } from '../../models';
 import { Sequelize } from 'sequelize';
+import { func } from 'joi';
 
 
 
@@ -80,7 +81,7 @@ async function update(id, body) {
   await repo.updateOne({ ID: id }, body)
 
   if (body.UserClientIds) {
-    const data = await show(id)
+    const data = await repo.findById(id)
     const areaIds = data.UserClient ? data.UserClient.map(m => m.Id) : []
     const add = _.difference(body.UserClientIds, areaIds)
     const rem = _.difference(areaIds, body.UserClientIds)
@@ -102,6 +103,40 @@ async function update(id, body) {
   return show(id)
 }
 
+// async function update(ID, body) {
+//   try {
+//     const data = await repo.findById(ID);
+//     console.log("data is ", data);
+//     if (!data) {
+//       return null;
+//     }
+//     data.setUserClient([]);
+//     await repo.updateOne({ ID: ID }, body);
+
+//     if (body.UserClientIds) {
+//       const add = body.UserClientIds;
+//       if (add.length) {
+//         await Promise.all(
+//           add.map(async (m) => {
+//             const cate = await userClientModule.service.show(m);
+//             console.log("Fetched 'cate' record:", cate);
+//             await cate.addCategory(data);
+//             console.log("Added new data", cate);
+//           })
+//         );
+//       }
+//     }
+//     return data;
+//   } catch (error) {
+//     console.error("Error updating data:", error);
+//     throw error;
+//   }
+// }
+
+
+
+
+
 async function updatecount(id, body) {
   await repo.updateOne({ ID: id }, body)
 }
@@ -116,6 +151,10 @@ async function show(id) {
   return repo.findById(id)
 }
 
+async function show1(id) {
+  return repo.findById1(id)
+}
+
 async function destroy(id) {
   const elementType = await repo.findById(id)
   if (elementType && elementType.UserClient && elementType.UserClient.length) {
@@ -128,6 +167,7 @@ export default {
   create,
   index,
   show,
+  show1,
   update,
   destroy,
   updatecount

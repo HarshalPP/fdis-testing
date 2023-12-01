@@ -50,8 +50,40 @@ const updateImage = async(Id,file)=> {
 
   };
 
+  const ekaSignature = async (id) => {
+    try {
+      const clientId = id;
+      const raw = `
+        SELECT
+          Id,
+          AuditId,  -- Assuming AuditId is a column in the AuditRemarks table
+          image
+        FROM
+          AuditRemarks
+        WHERE
+          AuditId = :clientId`;
+  
+      const result = await ImgSeq.sequelize.query(raw, {
+        type: Sequelize.QueryTypes.SELECT,
+        replacements: { clientId }, // Parameterized query
+      });
+  
+      return result;
+    } catch (error) {
+      console.error('Error in ekaSignature:', error);
+      throw error; // Re-throw the error to handle it in the calling function
+    }
+  };
+  
+  
+  
+  
+
+
+
 
 export default {
   uplode,
   updateImage,
+  ekaSignature
 }

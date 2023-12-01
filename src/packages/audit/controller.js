@@ -78,6 +78,12 @@ async function index(req, res) {
 }
 
 
+async function AuditSearch(req,res){
+  const[error,result]= await to(service.AuditSearch(req.query))
+  return handleResponse(error,result,req,res)
+}
+
+
 const create = async (req, res) => {
  
   const body =pick(req.body, config.ALLOWED_UPDATE_ATTRIBUTE)
@@ -132,5 +138,6 @@ export default {
   locationbyclient,
   deleteAllRecords,
   upload,
-  index
+  index,
+  AuditSearch
 }

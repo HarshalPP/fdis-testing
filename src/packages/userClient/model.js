@@ -87,6 +87,11 @@ const UserClientSeqFactory = () => {
       Active: {
         type: DataTypes.BOOLEAN, 
         allowNull: true,
+      },
+      Email:{
+        type:DataTypes.STRING,
+        allowNull:true
+
       }
     },
     {

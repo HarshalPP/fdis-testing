@@ -1,4 +1,4 @@
-import { SuperUserSeq,SuperUser,UserSeq,AuditSeq,AreaDescriptionSeq,CategorySe,ElementTypeSeq,FormErrorElement,ImgSeq, UserClientSeq,Modules} from '../../models';
+import { SuperUserSeq,SuperUser,UserSeq,AuditSeq,AreaDescriptionSeq,CategorySe,ElementTypeSeq,FormErrorElement,ImgSeq, UserClientSeq,Modules, FloorSeq, ErrorTypeSeq, CategorySeq, ElementSeq} from '../../models';
 import {Sequelize}from 'sequelize'
 import method from './method'
 import { commonLocale } from '../../locales'
@@ -9,6 +9,8 @@ const multer = require('multer')
 const uplodeRepo=require('../Img_Uplode/repository')
 const fs = require('fs')
 const path = require('path');
+
+
 
 async function findOne(query) {
   return SuperUserSeq.findOne({
@@ -189,6 +191,301 @@ const CompanyDetail = async (query) => {
     type: Sequelize.QueryTypes.SELECT
    })
  }
+
+ 
+
+//  const webdata = async (id) => {
+//   const clientId = id;
+//   const raw = `
+//     SELECT
+//       fe.ErrorElementId,
+//       fe.FormId,
+//       fe.ErrorTypeId,
+//       fe.ElementId,
+//       fe.Logbook,
+//       fe.TechnicalAspects,
+//       fe.LogbookImage,
+//       fe.TechnicalAspectsImage,
+//       fe.Count,
+//       f.Id AS FormId,
+//       f.CounterElement,
+//       f.Date,
+//       f.PresentClient,
+//       f.ApprovedLimits,
+//       f.AreaCode,
+//       f.Faults,
+//       f.Comments,
+//       f.AuditId AS FormAuditId,
+//       f.CategoryId,
+//       f.FloorId,
+//       f.AuditBy_Id,
+//       f.Uploaded,
+//       f.Remarks,
+//       f.AreaDescId,
+//       f.AreaDescModuleId
+//     FROM
+//     FormErrorElement1 fe
+//     JOIN
+//       Forms f ON fe.FormId = f.Id
+//     WHERE
+//       f.AuditId = '${clientId}'`;
+  
+//   return FormErrorElement.sequelize.query(raw, {
+//     type: Sequelize.QueryTypes.SELECT,
+//   });
+// };
+
+// const webdata = async (id) => {
+//   const clientId = id;
+//   const raw = `
+//   SELECT
+//     fe.ErrorElementId,
+//     fe.FormId,
+//     fe.Performer_Id,
+//     fe.ErrorTypeId,
+//     fe.ElementId,
+//     fe.Logbook,
+//     fe.TechnicalAspects,
+//     fe.LogbookImage,
+//     fe.TechnicalAspectsImage,
+//     fe.Count,
+//     f.Id AS FormId,
+//     f.CounterElement,
+//     f.Date,
+//     f.PresentClient,
+//     f.ApprovedLimits,
+//     f.AreaCode,
+//     f.Faults,
+//     f.Comments,
+//     f.AuditId AS FormAuditId,
+//     f.CategoryId,
+//     f.FloorId,
+//     f.AuditBy_Id,
+//     f.Uploaded,
+//     f.Remarks,
+//     f.AreaDescId,
+//     f.AreaDescModuleId,
+//     N.UserId AS Performer_Id,
+//     N.UserName,
+//     fl.FloorName  -- Add the columns you want from the Floor table
+//   FROM
+//     FormErrorElement1 fe
+//   LEFT JOIN
+//     Forms f ON fe.FormId = f.Id
+//   LEFT JOIN 
+//     NewPerformer N ON fe.Performer_Id = N.UserId
+//   WHERE
+//     f.AuditId = '${clientId}'`;;
+
+//   // Include additional condition to check for data existence for the specified FormId
+//   const checkDataExistence = `
+//     IF EXISTS (
+//       SELECT 1
+//       FROM FormErrorElement1
+//       WHERE FormId = '${clientId}'
+//     )
+//     SELECT 1 AS DataExists
+//     ELSE
+//     SELECT 0 AS DataExists`;
+
+//   try {
+    
+//     // Execute the first query to retrieve data
+//     const result = await FormErrorElement.sequelize.query(raw, {
+//       type: Sequelize.QueryTypes.SELECT,
+//     });
+
+
+//     // Check if result contains data
+//     if (result.length > 0) {
+//       for(let i=0;i<result.length;i++){
+//         console.log(result[i].FloorId)
+//       }
+
+//       const errorTypeIds = result.map(row => row.ErrorTypeId);
+//       const elementIds = result.map(row => row.ElementId);
+
+//       console.log('Searching for ErrorTypeIds:', errorTypeIds);
+//       console.log('Searching for ElementIds:', elementIds);
+
+//       const allErrorTypes = await ErrorTypeSeq.findAll({
+//         raw: true,
+//         where: {
+//           ErrorTypeId: errorTypeIds,
+//         },
+//       });
+
+//       const allCategories = await ElementSeq.findAll({
+//         raw: true,
+//         where: {
+//           Id: elementIds,
+//         },
+//       });
+
+//       console.log("allErrorTypes", allErrorTypes);
+//       console.log("allCategories", allCategories);
+
+//       // Merge the additional ErrorType and ElementId data into the result for each row
+//       result.forEach((row, index) => {
+//         row.ErrorType = allErrorTypes.filter(item => item.ErrorTypeId === row.ErrorTypeId);
+//         row.ElementId = allCategories.filter(item => item.Id === row.ElementId);
+//       });
+//     }
+
+//     // Execute the second query to check data existence
+//     const dataExistsResult = await FormErrorElement.sequelize.query(checkDataExistence, {
+//       type: Sequelize.QueryTypes.SELECT,
+//     });
+
+//     const dataExists = dataExistsResult[0].DataExists === 1;
+
+//     return {
+//       result,
+//       dataExists,
+//     };
+//   } catch (error) {
+//     console.error('Error retrieving form data:', error);
+//     throw error; // Handle or log the error as needed
+//   }
+// };
+
+
+const webdata = async (id) => {
+  const clientId = id;
+  const raw = `
+    SELECT
+      fe.ErrorElementId,
+      fe.FormId,
+      fe.Performer_Id,
+      fe.ErrorTypeId,
+      fe.ElementId,
+      fe.Logbook,
+      fe.TechnicalAspects,
+      fe.LogbookImage,
+      fe.TechnicalAspectsImage,
+      fe.Count,
+      f.Id AS FormId,
+      f.CounterElement,
+      f.Date,
+      f.PresentClient,
+      f.ApprovedLimits,
+      f.AreaCode,
+      f.Faults,
+      f.Comments,
+      f.AuditId AS FormAuditId,
+      f.CategoryId,
+      f.FloorId,
+      f.AuditBy_Id,
+      f.Uploaded,
+      f.Remarks,
+      f.AreaDescId,
+      f.AreaDescModuleId,
+      N.UserId AS Performer_Id,
+      N.UserName
+    FROM
+      FormErrorElement1 fe
+    LEFT JOIN
+      Forms f ON fe.FormId = f.Id
+    LEFT JOIN 
+      NewPerformer N ON fe.Performer_Id = N.UserId
+    WHERE
+      f.AuditId = '${clientId}'`;
+
+  const checkDataExistence = `
+    IF EXISTS (
+      SELECT 1
+      FROM FormErrorElement1
+      WHERE FormId = '${clientId}'
+    )
+    SELECT 1 AS DataExists
+    ELSE
+    SELECT 0 AS DataExists`;
+
+  try {
+    const result = await FormErrorElement.sequelize.query(raw, {
+      type: Sequelize.QueryTypes.SELECT,
+    });
+
+    // Check if result contains data
+    if (result.length > 0) {
+      for (let i = 0; i < result.length; i++) {
+        const floorId = result[i].FloorId;
+        const categoryId = result[i].CategoryId;
+        console.log("categoryId is",categoryId)
+
+        // Fetch Floor data based on FloorId
+        const floorData = await FloorSeq.findOne({
+          raw: true,
+          where: {
+            Id: floorId,
+          },
+        });
+
+        // Check if Floor data is found and matches the FloorId
+        if (floorData && floorData.Id === floorId) {
+          result[i].matchedFloorData = floorData;
+        }
+
+        // Fetch Category data based on CategoryId
+        const categoryData = await CategorySeq.findOne({
+          raw: true,
+          where: {
+            Id: categoryId,
+          },
+        });
+
+        console.log("cate-->", categoryData)
+
+        // Check if Category data is found and matches the CategoryId
+        if (categoryData && categoryData.ID === categoryId) {
+          result[i].matchedCategoryData = categoryData;
+        }
+      }
+
+      const errorTypeIds = result.map(row => row.ErrorTypeId);
+      const elementIds = result.map(row => row.ElementId);
+
+      const allErrorTypes = await ErrorTypeSeq.findAll({
+        raw: true,
+        where: {
+          ErrorTypeId: errorTypeIds,
+        },
+      });
+
+      const allCategories = await ElementSeq.findAll({
+        raw: true,
+        where: {
+          Id: elementIds,
+        },
+      });
+
+      // Merge the additional ErrorType and ElementId data into the result for each row
+      result.forEach((row, index) => {
+        row.ErrorType = allErrorTypes.filter(item => item.ErrorTypeId === row.ErrorTypeId);
+        row.ElementId = allCategories.filter(item => item.Id === row.ElementId);
+      });
+    }
+
+    // Execute the second query to check data existence
+    const dataExistsResult = await FormErrorElement.sequelize.query(checkDataExistence, {
+      type: Sequelize.QueryTypes.SELECT,
+    });
+
+    const dataExists = dataExistsResult[0].DataExists === 1;
+
+    return {
+      result,
+      dataExists,
+    };
+  } catch (error) {
+    console.error('Error retrieving form data:', error);
+    throw error; // Handle or log the error as needed
+  }
+};
+
+
+
+
 
  const Areaname=async (id) => {
   const categoryID=id;
@@ -552,6 +849,7 @@ export default {
  logout,
  getFeedback,
  feedback,
- finddata
+ finddata,
+ webdata
 
 }

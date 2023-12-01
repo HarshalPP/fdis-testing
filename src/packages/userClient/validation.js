@@ -18,7 +18,8 @@ export default {
       URLClientPortal: Joi.string().allow([null, '']).error(errorMessage()),
       ReportType: Joi.number().allow([null, '']).error(errorMessage()),
       Password: Joi.string().allow([null, '']).error(errorMessage()),
-      ImageUrl: Joi.string().allow([null, '']).error(errorMessage())
+      ImageUrl: Joi.string().allow([null, '']).error(errorMessage()),
+      Email:Joi.string().allow([null, '']).error(errorMessage()),
     }
   }
 }

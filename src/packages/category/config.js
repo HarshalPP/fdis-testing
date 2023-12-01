@@ -6,8 +6,14 @@ const ALLOWED_UPDATE_ATTRIBUTE = [
   'UserClientIds',
   'CategoryId',
   'MinimunSizeRange',
+  'MinimunSizeRange1',
+  'MinimunSizeRange2',
  'MaximunSizeRange',
-  'ApprovedLimit'
+ 'MaximunSizeRange1',
+ 'MaximunSizeRange2',
+  'ApprovedLimit',
+  'ApprovedLimit1',
+  'ApprovedLimit2'
 ];
 
 export default {

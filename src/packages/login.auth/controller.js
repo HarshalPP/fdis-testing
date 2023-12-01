@@ -10,6 +10,12 @@ async function show(req, res) {
   return handleResponse(error, result, req, res)
 }
 
+async function show1(req, res) {
+  const [error, result] = await to(service.show1(req.params.id))
+  return handleResponse(error, result, req, res)
+}
+
+
 
 async function index(req, res) {
   const [error, result] = await to(service.index(req.query))
@@ -18,9 +24,22 @@ async function index(req, res) {
 
 }
 
+async function index1(req, res) {
+  const [error, result] = await to(service.index1(req.query))
+  // console.log(result)
+  return handleResponse(error, result, req, res)
+
+}
+
 const create = async (req, res) => {
   const body = pick(req.body, config.ALLOWED_UPDATE_ATTRIBUTE)
   const [error, data] = await to(service.create(body, req.user))
+  handleResponse(error, data, req, res)
+}
+
+const create1 = async (req, res) => {
+  const body = pick(req.body)
+  const [error, data] = await to(service.create1(body,req.user))
   handleResponse(error, data, req, res)
 }
 
@@ -43,5 +62,8 @@ export default {
   show,
   update,
   deleteRecord,
+  create1,
+  show1,
+  index1
   
 }

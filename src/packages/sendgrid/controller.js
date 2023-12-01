@@ -7,6 +7,19 @@ const create = async (req, res) => {
   handleResponse(error, data, req, res);
 }
 
+async function createbyid(req, res) {
+  try {
+    const [error, result] = await to(service.createbyid(req.params.id));
+    handleResponse(error, result, req, res);
+  } catch (error) {
+    // Handle unexpected errors (e.g., syntax errors, etc.)
+    console.error('Unexpected error:', error);
+    res.status(500).json({
+      error: 'An unexpected error occurred while processing the request',
+    });
+  }
+}
 export default {
   create,
+  createbyid
 };

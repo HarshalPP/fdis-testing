@@ -10,6 +10,11 @@ async function show(req, res) {
   return handleResponse(error, result, req, res)
 }
 
+async function show1(req, res) {
+  const [error, result] = await to(service.show1(req.params.id))
+  return handleResponse(error, result, req, res)
+}
+
 async function index(req, res) {
   const [error, result] = await to(service.index(req.query))
   return handleResponse(error, result, req, res)
@@ -46,5 +51,6 @@ export default {
   show,
   update,
   updatecount,
-  deleteRecord
+  deleteRecord,
+  show1
 }

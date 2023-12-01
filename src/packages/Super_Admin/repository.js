@@ -3,6 +3,7 @@ import {  SuperAdminSeq } from '../../models';
 import { queryBuilderGetList } from './query-builder'
 import { listInitOptions } from '../../utils/paginate'
 import  bcrypt from 'bcrypt';
+const jwt = require('jsonwebtoken');
 
 import method from './method'
 
@@ -314,6 +315,7 @@ const findAlll = async () => {
        *
       FROM
       [fdis].[dbo].[Administrator]
+      ORDER BY UserName ASC
     `;
 
   return SuperAdminSeq.sequelize.query(raw, {
@@ -383,6 +385,11 @@ async function updatedata(query, body) {
 
 async function UpdatePass(query, body) {
   try {
+    // Ensure both password and password salt are present
+    if (!body.Password || !body.PasswordSalt) {
+      throw new Error('Both password and password salt are required.');
+    }
+
     // Hash the new password and salt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(body.Password, saltRounds);
@@ -402,7 +409,7 @@ async function UpdatePass(query, body) {
     console.log('Old PasswordSalt:', user.PasswordSalt);
     console.log('New Hashed PasswordSalt:', hashedPasswordSalt);
 
-    // Update the password in the database
+    // Update the password and password salt in the database
     const [updatedRows] = await SuperAdminSeq.update(
       { Password: hashedPassword, PasswordSalt: hashedPasswordSalt },
       { where: { ...query } }
@@ -418,6 +425,97 @@ async function UpdatePass(query, body) {
     throw error; // Rethrow the error to handle it at a higher level if necessary
   }
 }
+
+
+
+async function login(body) {
+  console.log("body data is", body);
+  try {
+    const user = await SuperAdminSeq.findOne({
+      where: {
+        UserName: body.UserName,
+      },
+    });
+
+    // If user is found and has a password field
+    if (user && user.Password) {
+      // Compare the hashed passwords
+      if (bcrypt.compareSync(body.Password, user.Password)) {
+        // Generate a token
+        const secretKey = 'FDIS8EC40090-E1F0-4CF6'; // Replace with your secret key
+        const token = jwt.sign({ userId: user.UserId }, secretKey, { expiresIn: '24h' });
+
+        // Return the user and token
+        return { user, token };
+      } else {
+        // Passwords do not match
+        throw new Error('Invalid password');
+      }
+    } else {
+      // Handle the case where the password is not found
+      throw new Error('Password not found');
+    }
+  } catch (error) {
+    console.error(error);
+    // Return a 500 error response
+    throw new Error('Internal Server Error');
+  }
+}
+
+
+
+// // repository.js
+// const { Op } = require('sequelize');
+
+// async function login(query) {
+//   // Try to find the user in SuperAdminSeq
+//   const superAdmin = await SuperAdminSeq.findOne({
+//     where: {
+//       ...query
+//     }
+//   });
+
+//   // If not found in SuperAdminSeq, try CustumerSeq
+//   if (!superAdmin) {
+//     const customer = await CustumerSeq.findOne({
+//       where: {
+//         ...query
+//       }
+//     });
+
+//     return customer; // Note: This might return null if not found in CustumerSeq as well
+//   }
+
+//   return superAdmin;
+// }
+
+
+const logout = async (token) => {
+
+  try {
+    const secretkey='FDIS8EC40090-E1F0-4CF6'
+    jwt.verify(token, secretkey); // Verify the token to ensure it's valid
+
+    // Perform any additional logout-related tasks here, if needed.
+    // For example, you might invalidate the token, update session status, etc.
+
+    const response = {
+      code: 200,
+      Message: 'Logged out successfully',
+    };
+    console.log(response)
+
+    return response;
+  } catch (error) {
+    const response = {
+      code: 400,
+      Message: 'Logout failed',
+    };
+
+    return response;
+  }
+};
+
 
 
 
@@ -437,7 +535,9 @@ export default {
   finddata,
   updatedata,
   deleteRecorddata,
-  UpdatePass
+  UpdatePass,
+  login,
+  logout
   
   // findAllByRole
 

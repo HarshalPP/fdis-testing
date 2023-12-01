@@ -196,6 +196,7 @@ async function findById(id) {
 
 
 const findAll = async (request) => {
+  console.log("request data is",request)
   const condition = queryBuilderGetList(request)
   console.log("condition is ",condition)
   const option = listInitOptions(request)
@@ -222,12 +223,73 @@ const findAll = async (request) => {
         ]
       },
       'Location',
-     
-
       'NewPerformers'
       ]
   })
 }
+
+
+
+const AuditSearch = async (request) => {
+  console.log("request data is", request);
+  const condition = queryBuilderGetList(request);
+  console.log("condition is ", condition);
+  const option = listInitOptions(request);
+  option.raw = undefined;
+
+  try {
+    const result = await AuditSeq.findAndCountAll({
+      where: {
+        ...condition,
+        IsActive: false, // Only include rows where IsActive is false
+      },
+      ...option,
+      attributes: {
+        exclude: request.excludes,
+        include: request.includes,
+      },
+      include: [
+        {
+          model: UserClientSeq,
+          as: 'Users_Client',
+          include: [
+            'Country',
+            {
+              model: BranchSeq,
+              as: 'Branch',
+            },
+            'User',
+          ],
+        },
+        'Location',
+        'NewPerformers',
+      ],
+    });
+
+    // Check if any active data was found
+    if (!result || result.count === 0) {
+      throw new Error('No active data found');
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+
+    // Check if the error is related to inactive data
+    if (error.message === 'No active data found') {
+      // Return a 500 status error
+      const errorResponse = {
+        status: 500,
+        message: 'No active data found',
+      };
+      throw errorResponse;
+    }
+
+    // Handle or log other errors as needed
+    throw error;
+  }
+};
+
 
 //             // Find all method // 
 
@@ -812,5 +874,6 @@ export default {
   findAllLocations,
   findallaudit,
   uploadImageById,
-  rawQueryList
+  rawQueryList,
+  AuditSearch
 };

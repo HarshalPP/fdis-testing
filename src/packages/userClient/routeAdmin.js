@@ -290,6 +290,7 @@ router.post('/upload', upload.single('image'), async (req, res) => {
       ReportType: req.body.ReportType,
       Active:req.body.Active,
       image: s3UploadResult.Location,
+      Email:req.body.Email
     };
 
     await UserClientSeq.create(userClientData); // Use .create() to insert data
@@ -325,6 +326,123 @@ router.post('/upload', upload.single('image'), async (req, res) => {
   //   })
   // }
   // })
+
+
+  
+// Assuming newperformerseq is correctly imported
+// router.patch('/UserClient/:id', upload.single('image'), async (req, res) => {
+//   try {
+//     if (!req.file) {
+//       return res.status(400).json({ message: 'Image not provided' });
+//     }
+
+//     console.log('Request Body:', req.body);
+
+//     // Find the existing performer based on the provided ID
+//     const existingPerformer = await UserClientSeq.findByPk(req.params.id);
+
+//     if (!existingPerformer) {
+//       // If performer with the given ID is not found, return an error response
+//       return res.status(404).json({ error: 'Adminstrator not found' });
+//     }
+
+//     // Check if there is an uploaded image
+//     if (req.file) {
+//       try {
+//         // Upload the new image to S3
+//         const s3UploadResult = await uploadToS3(req.file.buffer);
+
+//         console.log("S3 Upload Result:", s3UploadResult);
+
+//         // Update the ProfileImage field in the existing performer with the new S3 upload location
+//         existingPerformer.image = s3UploadResult.Location;
+//       } catch (s3UploadError) {
+//         console.error('Error uploading image to S3:', s3UploadError.message);
+//         return res.status(500).json({
+//           error: 'An error occurred while uploading image to S3.',
+//         });
+//       }
+//     }
+//     // Update all other fields based on the data provided in req.body
+//     for (const key in req.body) {
+//       // Exclude image from being updated again
+//       if (key !== 'image') {
+//         existingPerformer[key] = req.body[key];
+//       }
+//     }
+
+//     // Save the updated performer to the database
+//     const result = await existingPerformer.save();
+
+//     console.log("Update result:", result);
+//     return res.status(200).json({
+//       message: 'Client updated successfully',
+//       updatedPerformer: result,
+//     });
+
+//   } catch (error) {
+//     console.error('Error updating Client:', error);
+//     return res.status(500).json({
+//       error: 'An error occurred while updating the Client.',
+//     });
+//   }
+// });
+
+
+                             // Update the Api //
+
+router.patch('/UserClient/:id', upload.single('image'), async (req, res) => {
+  try {
+
+    // Find the existing performer based on the provided ID
+    const existingPerformer = await UserClientSeq.findByPk(req.params.id);
+
+    if (!existingPerformer) {
+      return res.status(404).json({ error: 'Adminstrator not found' });
+    }
+
+    // Check if there is an uploaded image
+    let s3UploadResult;
+    if (req.file) {
+      try {
+        // Upload the new image to S3
+        s3UploadResult = await uploadToS3(req.file.buffer);
+        console.log("S3 Upload Result:", s3UploadResult);
+      } catch (s3UploadError) {
+        console.error('Error uploading image to S3:', s3UploadError.message);
+        return res.status(500).json({
+          error: 'An error occurred while uploading image to S3.',
+        });
+      }
+    }
+
+    // Build the update object based on req.body and uploaded image (if any)
+    const updateObject = {
+      ...(s3UploadResult && { image: s3UploadResult.Location }),
+      ...req.body,
+    };
+
+    // Use the update method to update the performer in the database
+    const result = await existingPerformer.update(updateObject);
+
+    console.log("Update result:", result);
+
+    return res.status(200).json({
+      message: 'Client updated successfully',
+      updatedPerformer: result,
+    });
+
+  } catch (error) {
+    console.error('Error updating Client:', error);
+    return res.status(500).json({
+      error: 'An error occurred while updating the Client.',
+    });
+  }
+});
+
+
+
+
 
 
 

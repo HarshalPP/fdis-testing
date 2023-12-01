@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { SuperAdminSeq} from '../../models';
+import { SuperAdminSeq,SuperUser} from '../../models';
 import { queryBuilderGetList } from './query-builder'
 import { listInitOptions } from '../../utils/paginate'
 
@@ -8,6 +8,7 @@ async function findById(id) {
   return SuperAdminSeq.findByPk(id)
 
 }
+
 
 // const findAllByRole = async () => {
 
@@ -25,12 +26,38 @@ async function findById(id) {
 
 
 async function findOne(query) {
-  return SuperAdminSeq.findOne({
+  return SuperUser.findOne({
     where: {
       ...query
     }
   });
 }
+
+async function create1(body) {
+  return (await SuperUser.create(body)).get({ plain: true })
+}
+
+async function findById1(id) {
+
+  return SuperUser.findByPk(id)
+
+}
+
+const rawQueryList1 = async () => {
+  const raw = `SELECT *
+  FROM  aspnet_Roles
+  inner join aspnet_UsersInRoles on aspnet_Roles.RoleId=aspnet_UsersInRoles.RoleId
+  inner join aspnet_Users on aspnet_UsersInRoles.UserId=aspnet_Users.UserId
+  where aspnet_Roles.RoleId='6BF066DD-C1CF-4F0B-B982-7555DE280212'
+  `
+   return SuperUser.sequelize.query(raw, {
+     type: Sequelize.QueryTypes.SELECT
+   })
+ }
+
+
+
+
 
 async function create(body) {
   return (await SuperAdminSeq.create(body)).get({ plain: true })
@@ -99,6 +126,8 @@ const rawQueryList = async () => {
   })
 }
 
+ 
+
 
 // const rawQueryList = async () => {
   
@@ -127,6 +156,9 @@ export default {
   destroy,
   findAllJoin,
   rawQueryList,
+  create1,
+  findById1,
+  rawQueryList1
   // findAllByRole
   
 }

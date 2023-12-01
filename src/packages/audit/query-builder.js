@@ -57,7 +57,11 @@ const queryBuilderGetList = (request = {}) => {
   }
 
   return match
+ 
+
 }
+
+console.log(queryBuilderGetList)
 
 export {
   queryBuilderGetList

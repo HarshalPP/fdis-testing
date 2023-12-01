@@ -101,6 +101,7 @@ const multer = require('multer');
 const util = require('util');
 const fs = require('fs');
 import { FormErrorElement } from '../../models';
+import { date } from 'joi';
 const router = express.Router();
 const unlinkFile = util.promisify(fs.unlink);
 
@@ -152,6 +153,65 @@ const uploadToS3 = (fileData, fileName) => {
 // Route to handle image upload and data insertion for multiple photos
 // ...
 
+
+router.patch('/update/:id', upload.fields([
+  { name: 'TechnicalAspectsImages', maxCount: 1 },
+  { name: 'LogbookImages', maxCount: 1 },
+]), async (req, res) => {
+  try {
+    const formIdToUpdate = req.params.id;
+
+    // Retrieve the existing record from the database
+    const existingData = await FormErrorElement.findByPk(formIdToUpdate);
+
+    if (!existingData) {
+      return res.status(404).json({
+        error: 'Record not found',
+      });
+    }
+
+    // Update the record with the new data
+    existingData.FormId = req.body.FormId || existingData.FormId;
+    existingData.ErrorTypeId = req.body.ErrorTypeId || existingData.ErrorTypeId;
+    existingData.ElementId = req.body.ElementId || existingData.ElementId;
+    existingData.Logbook = req.body.Logbook || existingData.Logbook;
+    existingData.Performer_Id=req.body.Performer_Id || existingData.Performer_Id ;
+    existingData.TechnicalAspects = req.body.TechnicalAspects || existingData.TechnicalAspects;
+
+    if (req.files['TechnicalAspectsImages']) {
+      const technicalAspectsImage = req.files['TechnicalAspectsImages'][0];
+      existingData.TechnicalAspectsImage = (await uploadToS3(technicalAspectsImage.buffer, `${Date.now().toString()}_technical.png`)).Location;
+    }
+    
+    if (req.files['LogbookImages']) {
+      const logbookImage = req.files['LogbookImages'][0];
+      existingData.LogbookImage = (await uploadToS3(logbookImage.buffer, `${Date.now().toString()}_logbook.png`)).Location;
+    }
+
+    existingData.Count = req.body.Count || existingData.Count;
+
+    // Save the updated record to the database
+    const updatedData = await existingData.save();
+
+    res.status(200).json({
+      message: 'Record updated successfully',
+      TechnicalAspectsImages: updatedData.TechnicalAspectsImage,
+      LogbookImages: updatedData.LogbookImage,
+      data: updatedData,
+    });
+  } catch (error) {
+    console.error('Error updating record:', error);
+    res.status(500).json({
+      error: 'An error occurred while processing the request',
+    });
+  }
+});
+
+
+
+
+
+
 router.post('/upload', upload.fields([
   { name: 'TechnicalAspectsImages', maxCount: 1 },
   { name: 'LogbookImages', maxCount: 1 },
@@ -167,11 +227,13 @@ router.post('/upload', upload.fields([
       FormId: req.body.FormId,
       ErrorTypeId: req.body.ErrorTypeId,
       ElementId: req.body.ElementId,
+      Performer_Id:req.body.Performer_Id,
       Logbook: req.body.Logbook,
       TechnicalAspects: req.body.TechnicalAspects,
       LogbookImage: logbookImageUrl ? logbookImageUrl.Location : null, // Set the LogbookImage to the URL string or null
       TechnicalAspectsImage: technicalAspectsImageUrl ? technicalAspectsImageUrl.Location : null, // Set the TechnicalAspectsImage to the URL string or null
       Count: req.body.Count,
+      Date: new Date().toISOString(),
     };
 
     // Now save data to the database using Mongoose
@@ -223,10 +285,44 @@ router.post('/logout', async (req, res) => {
 });
 
 
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const formIdToDelete = req.params.id;
+
+    // Find the record by ID
+    const existingData = await FormErrorElement.findByPk(formIdToDelete);
+
+    if (!existingData) {
+      return res.status(404).json({
+        error: 'Record not found',
+      });
+    }
+
+    // Delete the record
+
+    await existingData.destroy();
+
+    res.status(200).json({
+      message: 'Record deleted successfully',
+      data: existingData,
+    });
+  } catch (error) {
+    console.error('Error deleting record:', error);
+    res.status(500).json({
+      error: 'An error occurred while processing the request',
+    });
+  }
+});
+
+
+
+
+
 router.post('/auth', controller.authorizetion)
 router.get('/auditlist',controller.Audit_list)
 router.get('/companyDetail',controller.CompanyDetail)
 router.get('/categorybyID/:id',controller.CategoryById)
+router.get('/webdata/:id', controller.webdata)
 router.get('/areaname/:id',controller.Areaname)
 router.get('/elementcount/:id',controller.ElementCount)
 router.get('/auditPresent/:id',controller.AuditPresent)

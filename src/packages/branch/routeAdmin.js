@@ -5,7 +5,8 @@ import validator from '../validator'
 
 const router = express.Router()
 
-router.post('/', validator.branch.create, controller.create)
+// router.post('/', validator.branch.create, controller.create)
+router.post('/',  controller.create)
 router.patch('/:id', controller.update)
 router.get('/', controller.index)
 router.get('/:id', controller.show)

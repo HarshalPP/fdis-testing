@@ -385,7 +385,13 @@ async function logout(req, res) {
 
 async function login(req, res) {
   try {
+    // const salt=10;
     const { UserName, Password } = req.body;
+
+    // if(req.body.Password){
+    //   const hashedPassword=await bcrypt.hash(req.body.Password,salt)
+    //   req.body.Password=hashedPassword
+    // }
 
     // Retrieve the user from the database based on the provided UserName
     const newLogin = await newperformerseq.findOne({ where: { UserName },
@@ -418,6 +424,7 @@ async function login(req, res) {
 
     res.status(200).json({
       Status: true,
+      UserId:newLogin.UserId,
       UserName: newLogin.UserName,
       Password:newLogin.Password,
       ProfileImage:newLogin.ProfileImage,
@@ -431,6 +438,58 @@ async function login(req, res) {
   }
 }
 
+
+// Assuming newperformerseq is correctly imported
+router.patch('/Performer/:id', upload.single('image'), async (req, res) => {
+  try {
+
+    // Find the existing performer based on the provided ID
+    const existingPerformer = await newperformerseq.findByPk(req.params.id);
+
+    if (!existingPerformer) {
+      // If performer with the given ID is not found, return an error response
+      return res.status(404).json({ error: 'Performer not found' });
+    }
+
+    // Check if there is an uploaded image
+    if (req.file) {
+      try {
+        // Upload the new image to S3
+        const s3UploadResult = await uploadToS3(req.file.buffer);
+
+        console.log("S3 Upload Result:", s3UploadResult);
+
+        // Update the ProfileImage field in the existing performer with the new S3 upload location
+        existingPerformer.ProfileImage = s3UploadResult.Location;
+
+        // Save the updated performer to the database
+        const result = await existingPerformer.save();
+
+        console.log("Update result:", result);
+        return res.status(200).json({
+          message: 'Performer updated successfully',
+          updatedPerformer: result,
+        });
+      } catch (s3UploadError) {
+        console.error('Error uploading image to S3:', s3UploadError.message);
+        return res.status(500).json({
+          error: 'An error occurred while uploading image to S3.',
+        });
+      }
+    }
+
+    // If no image update is needed, you can just return the existing performer
+    return res.status(200).json({
+      message: 'Performer updated successfully',
+      updatedPerformer: existingPerformer,
+    });
+  } catch (error) {
+    console.error('Error updating performer:', error);
+    return res.status(500).json({
+      error: 'An error occurred while updating the performer.',
+    });
+  }
+});
 
 
 

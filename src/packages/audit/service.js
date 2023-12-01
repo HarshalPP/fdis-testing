@@ -249,6 +249,32 @@ async function index(query) {
   return repo.findAll(query)
 }
 
+
+
+async function AuditSearch(query) {
+  try {
+    const result = await repo.AuditSearch(query);
+    
+    // Check if the result is undefined or null, and handle it as needed
+    if (!result) {
+      console.warn('Warning: Result is undefined or null');
+      // Return an appropriate response or throw an error
+      // For example:
+      // throw new Error('No data found');
+    }
+
+    // Assuming repo.AuditSearch returns the result directly
+    return result;
+  } catch (error) {
+    console.error('Error in AuditSearch:', error);
+    // Handle the error as needed
+    // For example:
+    // throw new Error('Internal Server Error');
+  }
+}
+
+
+
 async function uploadImageById(id, imageBase64) {
   return repo.uploadImageById(id, imageBase64);
 }
@@ -319,5 +345,6 @@ export default {
   indexJoin,
   locationbyclient,
   findallaudit,
-  uploadImageById
+  uploadImageById,
+  AuditSearch
 }

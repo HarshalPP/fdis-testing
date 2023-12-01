@@ -6,7 +6,7 @@ import { commonLocale } from '../../locales'
 
 async function create(body) {
   const data = await repo.findOne({
-    CompanyName: body.CompanyName.trim(),
+    CompanyName: body.CompanyName,
   })
   if (data) {
     throw new Error(JSON.stringify(commonLocale.dataAlreadyExisted))
@@ -14,6 +14,7 @@ async function create(body) {
 
   return repo.create(body)
 }
+
 
 async function update(id, body) {
   await repo.updateOne({ Id: id }, body)
@@ -29,6 +30,18 @@ async function show(id) {
   return repo.findById(id)
 }
 
+async function show1(id) {
+  return repo.findById1(id)
+}
+
+async function index1(query) {
+  return repo.rawQueryList1(query)
+}
+
+async function create1(body) {
+  return repo.create1(body)
+}
+
 async function destroy(id) {
   return repo.destroy(id)
 }
@@ -40,8 +53,11 @@ async function showbyid(id)
 export default {
   create,
   index,
+  index1,
   show,
   update,
   destroy,
-  showbyid
+  showbyid,
+  create1,
+  show1
 }

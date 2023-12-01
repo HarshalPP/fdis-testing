@@ -36,12 +36,13 @@ const findAll = async (request) => {
   return ElementSeq.findAndCountAll({
     where: condition,
     ...option,
+    order: [['ElementLabel', 'ASC']],
     attributes:
     {
       exclude: request.excludes,
       include: request.includes
     },
-    include: ['UserClient']
+    include: ['UserClient'],
   })
 }
 

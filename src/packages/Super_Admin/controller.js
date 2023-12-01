@@ -81,6 +81,17 @@ const UpdatePass = async (req, res) => {
 }
 
 
+               // login  //
+const auth = async (req, res) => {
+  const [error, data] = await to(service.auth(req.body))
+  handleResponse(error, data, req, res)
+} 
+
+
+
+
+
+
 
 export default {
   
@@ -95,6 +106,7 @@ export default {
   showww,
   updatedata,
   deleteRecorddata,
-  UpdatePass
+  UpdatePass,
+  auth
   
 }

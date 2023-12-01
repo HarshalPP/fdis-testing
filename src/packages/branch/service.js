@@ -5,6 +5,7 @@ import repo from './repository'
 import { commonLocale } from '../../locales'
 
 async function create(body) {
+  console.log("body data is",body)
   const data = await repo.findOne({
     BranchName: body.BranchName.trim(),
   })
@@ -14,6 +15,8 @@ async function create(body) {
 
   return repo.create(body)
 }
+
+
 
 async function update(id, body) {
   await repo.updateOne({ Id: id }, body)

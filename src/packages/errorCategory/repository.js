@@ -36,9 +36,13 @@ const findAll = async (request) => {
     {
       exclude: request.excludes,
       include: request.includes
-    }
+    },  // order: [['Name', 'ASC']]
+  
+    
   })
 }
+
+
 
 async function countDocuments(query) {
   return ErrorCategorySeq.count(query)

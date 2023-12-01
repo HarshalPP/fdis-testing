@@ -17,7 +17,7 @@ const CategorySeqFactory = () => {
       },
       IsFixed: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
       },
       CategoryName: {
         type: DataTypes.STRING,
@@ -25,7 +25,7 @@ const CategorySeqFactory = () => {
       },
       SortOrder: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
@@ -50,17 +50,17 @@ setTimeout(()=>{
 },0)
 
 setTimeout(() => {
-  UserClientSeq.belongsToMany(CategorySeq, {
-    through: 'Client_Category',
-    as: 'Category',
-    foreignKey: 'ClientId',
-    timestamps: false
-  });
-
+  
   CategorySeq.belongsToMany(UserClientSeq, {
     through: 'Client_Category',
     as: 'UserClient',
     foreignKey: 'CategoryId',
+    timestamps: false
+  });
+  UserClientSeq.belongsToMany(CategorySeq, {
+    through: 'Client_Category',
+    as: 'Category',
+    foreignKey: 'ClientId',
     timestamps: false
   });
 }, 0)

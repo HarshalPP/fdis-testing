@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'
 import { dbConfig } from '../../init/db'
+import{AreaDescriptionSeq} from '../../models'
 
 const ElementTypeSeqFactory = () => {
   return dbConfig.define(
@@ -30,6 +31,37 @@ const ElementTypeSeqFactory = () => {
   )
 }
 
+const ElementTypeAreaseq=dbConfig.define(
+  
+  'Elementype_Area',
+  {
+    timestamps:false,
+    tableName:'Elementype_Area',
+  }
+
+);
+
+
 const ElementTypeSeq = ElementTypeSeqFactory()
+
+
+setTimeout(()=>{
+
+  ElementTypeSeq.belongsToMany(AreaDescriptionSeq,{
+    through:ElementTypeAreaseq,
+    as:'ElementType',
+    foreignKey:'ElementTypeId',
+    timestamps:false,
+
+  })
+
+  AreaDescriptionSeq.belongsToMany(ElementTypeSeq,{
+    through:ElementTypeAreaseq,
+    as:'Area',
+    foreignKey:'AreaId',
+    timestamps:false,
+  })
+
+},0)
 
 export default ElementTypeSeq

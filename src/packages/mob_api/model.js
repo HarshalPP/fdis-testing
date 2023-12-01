@@ -79,6 +79,14 @@ const FormErrorElementSeqFactory = () => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+
+
+      Performer_Id:{
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+
+
       ElementId: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -102,6 +110,11 @@ const FormErrorElementSeqFactory = () => {
       Count: {
         type: DataTypes.INTEGER,
         allowNull: true,
+      },
+      Date: {
+        type: Date,
+        default: Date.now,
+        allowNull: true
       }
     },
     {
@@ -110,6 +123,7 @@ const FormErrorElementSeqFactory = () => {
     },
   )
 }
+
 
 const FormErrorElement = FormErrorElementSeqFactory()
 

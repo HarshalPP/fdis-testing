@@ -13,10 +13,11 @@ import { func } from 'joi';
 //   })
 // }
 
-async function findById(CategoryId) {
+
+async function findById1(CategoryId) {
   try {
     const category = await CategorySeq.findByPk(CategoryId, {
-      include: ['UserClient'], // Include associations as needed
+      include: ['UserClient'],
     });
 
     if (!category) {
@@ -27,8 +28,14 @@ async function findById(CategoryId) {
     const raw = `
       SELECT
         [MinimunSizeRange] AS minimum_size_range,
+        [MinimunSizeRange1] AS minimum_size_range1,
+        [MinimunSizeRange2] AS minimum_size_range2,
         [MaximunSizeRange] AS maximum_size_range,
-        [ApprovedLimit] AS approved_limit
+        [MaximunSizeRange1] AS maximum_size_range1,
+        [MaximunSizeRange2] AS maximum_size_range2,
+        [ApprovedLimit] AS approved_limit,
+        [ApprovedLimit1] AS approved_limit1,
+        [ApprovedLimit2] AS approved_limit2
       FROM [fdis].[dbo].[cat-list] AS cc
       LEFT JOIN [fdis].[dbo].[Categories] AS c ON c.Id = cc.CategoryId
       WHERE cc.CategoryId = :CategoryId
@@ -39,30 +46,40 @@ async function findById(CategoryId) {
       type: Sequelize.QueryTypes.SELECT,
     });
 
-    console.log("result data is", results);
+    // Combine category and results into a single object
+    const combinedData = {
+      category: category.toJSON(), // Convert category to a plain object
+      results: results,
+    };
 
-    // You can return both the category and the results here
-    return { category, results };
+    console.log("result data is", combinedData);
 
+    return combinedData;
   } catch (error) {
     throw error;
   }
 }
 
 
-// async function findById(CategoryId) {
-//   try {
-//     const category = await CategorySeq.findByPk(CategoryId, {
-//       include: ['UserClient'], // Include associations as needed
-//     });
-//     if (!category) {
-//       throw new Error(`Category with CategoryId ${CategoryId} not found`);
-//     }
-//     return category;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
+
+
+
+
+
+
+async function findById(CategoryId) {
+  try {
+    const category = await CategorySeq.findByPk(CategoryId, {
+      include: ['UserClient'], // Include associations as needed
+    });
+    if (!category) {
+      throw new Error(`Category with CategoryId ${CategoryId} not found`);
+    }
+    return category;
+  } catch (error) {
+    throw error;
+  }
+}
 
 
 
@@ -76,14 +93,16 @@ async function findOne(query) {
   });
 }
 
+
+
 async function create(body) {
   console.log("body data is",body)
   try {
     // Insert data into the "cat-list" table without specifying "CategoryId"
     const raw = `
-      INSERT INTO [fdis].[dbo].[cat-list] (CategoryId, MinimunSizeRange, MaximunSizeRange, ApprovedLimit)
-      VALUES (:categoryId, :minSizeRange, :maxSizeRange, :approvedLimit)
-    `;
+    INSERT INTO [fdis].[dbo].[cat-list] (CategoryId, MinimunSizeRange, MaximunSizeRange, ApprovedLimit,MinimunSizeRange1,MinimunSizeRange2,MaximunSizeRange1,MaximunSizeRange2,ApprovedLimit1,ApprovedLimit2)
+    VALUES (:categoryId, :minSizeRange, :minSizeRange1, :minSizeRange2, :maxSizeRange, :maxSizeRange1, :maxSizeRange2, :approvedLimit, :approvedLimit1, :approvedLimit2)
+  `;
 
     console.log("raw data is" ,raw)
 
@@ -94,8 +113,14 @@ async function create(body) {
     const replacements = {
       categoryId: newCategory.ID, // Use the ID of the newly created category
       minSizeRange: body.MinimunSizeRange ,
+      minSizeRange1: body.MinimunSizeRange1 ,
+      minSizeRange2: body.MinimunSizeRange2 ,
       maxSizeRange: body.MaximunSizeRange,
+      maxSizeRange1: body.MaximunSizeRange1,
+      maxSizeRange2: body.MaximunSizeRange2,
       approvedLimit: body.ApprovedLimit ,
+      approvedLimit1: body.ApprovedLimit1,
+      approvedLimit2: body.ApprovedLimit2
     };
 
     console.log("replacement data is",replacements)
@@ -123,8 +148,14 @@ async function updateOne(query, body) {
   const raw = `
    UPDATE [fdis].[dbo].[cat-list]
    SET MinimunSizeRange='${body.MinimunSizeRange}',
+   MinimunSizeRange1='${body.MinimunSizeRange1}',
+   MinimunSizeRange2='${body.MinimunSizeRange2}',
    MaximunSizeRange='${body.MaximunSizeRange}',
-   ApprovedLimit='${body.ApprovedLimit}'
+   MaximunSizeRange1='${body.MaximunSizeRange1}',
+   MaximunSizeRange2='${body.MaximunSizeRange2}',
+   ApprovedLimit='${body.ApprovedLimit}',
+   ApprovedLimit1='${body.ApprovedLimit1}',
+   ApprovedLimit2='${body.ApprovedLimit2}'
    WHERE [fdis].[dbo].[cat-list].CategoryId='${query.ID}'
   `;
 
@@ -133,8 +164,14 @@ async function updateOne(query, body) {
   // Define the replacements for the query
   const replacements = {
     MinimunSizeRange: body.MinimunSizeRange,
+    MinimunSizeRange1: body.MinimunSizeRange1,
+    MinimunSizeRange2: body.MinimunSizeRange2,
     MaximunSizeRange: body.MaximunSizeRange,
+    MaximunSizeRange1: body.MaximunSizeRange1,
+    MaximunSizeRange2: body.MaximunSizeRange2,
     ApprovedLimit: body.ApprovedLimit,
+    ApprovedLimit1: body.ApprovedLimit1,
+    ApprovedLimit2: body.ApprovedLimit2,
     CategoryId: query.ID,
   };
 
@@ -153,22 +190,25 @@ async function updateOne(query, body) {
   return body;
 }
 
-// async function updateOne(query, body) {
-//   console.log("Query data is", query);
-  
-//   // Use Sequelize ORM update method to update the record (optional)
-//   await CategorySeq.update(body, { where: { ...query } });
 
-//   // Return the updated data (you can choose to return the result of the Sequelize update method or body, depending on your needs)
-//   return body;
-// }
+async function updateOne(query, body) {
+  console.log("Query data is", query);
+  
+  // Use Sequelize ORM update method to update the record (optional)
+  await CategorySeq.update(body, { where: { ...query } });
+
+  // Return the updated data (you can choose to return the result of the Sequelize update method or body, depending on your needs)
+  return body;
+}
 
 
 
 const updatecount= async(id,body)=>{
 
   const raw=`UPDATE cat-list
-  SET MinimunSizeRange='${body.MinimunSizeRange}', MaximunSizeRange='${body.MaximunSizeRange}', ApprovedLimit='${body.ApprovedLimit}'
+  SET MinimunSizeRange='${body.MinimunSizeRange}',MinimunSizeRange1='${body.MinimunSizeRange1}',MinimunSizeRange2='${body.MinimunSizeRange2}', 
+  MaximunSizeRange='${body.MaximunSizeRange}',MaximunSizeRange1='${body.MaximunSizeRange1}',MaximunSizeRange2='${body.MaximunSizeRange2}',
+   ApprovedLimit='${body.ApprovedLimit}',ApprovedLimit1='${body.ApprovedLimit1}',ApprovedLimit2='${body.ApprovedLimit2}'
   WHERE cat-list.CategoryId='${id}'`;
 
   await CategorySeq.sequelize.query(raw,{
@@ -233,6 +273,7 @@ const destroy = async (id) => {
 
 export default {
   findById,
+  findById1,
   findAll,
   create,
   findOne,

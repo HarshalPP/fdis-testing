@@ -50,33 +50,183 @@ import AWS from 'aws-sdk';
 import { func } from 'joi';
 
 // Configure AWS
-AWS.config.update({
-  region: 'eu-central-1',
-  accessKeyId: 'AKIASHWNAZJVBVBGCWIL',
-  secretAccessKey: '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',
-});
-const S3 = new AWS.S3();
+// AWS.config.update({
+//   region: 'eu-central-1',
+//   accessKeyId: 'AKIASHWNAZJVBVBGCWIL',
+//   secretAccessKey: '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',
+// });
+// const S3 = new AWS.S3();
 
-// Function to upload to S3
-const uploadToS3 = async (fileData) => {
-  const params = {
-    Bucket: 'performer-logo',
-    Key: `${Date.now().toString()}.png`,
-    Body: fileData,
-  };
+// // Function to upload to S3
+// const uploadToS3 = async (fileData) => {
+//   const params = {
+//     Bucket: 'performer-logo',
+//     Key: `${Date.now().toString()}.png`,
+//     Body: fileData,
+//   };
 
-  return new Promise((resolve, reject) => {
-    S3.upload(params, (err, data) => {
-      if (err) {
-        console.error('Error uploading image to S3:', err);
-        reject(err);
-      } else {
-        console.log('S3 Upload Result:', data);
-        resolve(data);
-      }
-    });
-  });
-};
+//   return new Promise((resolve, reject) => {
+//     S3.upload(params, (err, data) => {
+//       if (err) {
+//         console.error('Error uploading image to S3:', err);
+//         reject(err);
+//       } else {
+//         console.log('S3 Upload Result:', data);
+//         resolve(data);
+//       }
+//     });
+//   });
+// };
+// import bcrypt from 'bcrypt';
+// import AWS from 'aws-sdk';
+
+// // Configure AWS
+// AWS.config.update({
+//   region: 'eu-central-1',
+//   accessKeyId: 'AKIASHWNAZJVBVBGCWIL',
+//   secretAccessKey: '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',
+// });
+// const S3 = new AWS.S3();
+
+// // Function to upload to S3
+// const uploadToS3 = (fileData) => {
+//   const params = {
+//     Bucket: 'performer-logo',
+//     Key: `${Date.now().toString()}.png`,
+//     Body: fileData,
+//   };
+
+//   return new Promise((resolve, reject) => {
+//     S3.upload(params, (err, data) => {
+//       if (err) {
+//         console.error('Error uploading image to S3:', err);
+//         reject(err);
+//       } else {
+//         console.log('S3 Upload Result:', data);
+//         resolve(data);
+//       }
+//     });
+//   });
+// };
+
+
+// async function create(body) {
+//  return newperformerseq.create(body);
+// }
+
+
+
+
+
+
+
+// import AWS from 'aws-sdk';
+// import { func } from 'joi';
+
+// // Configure AWS
+// AWS.config.update({
+//   region: 'eu-central-1',
+//   accessKeyId: 'AKIASHWNAZJVBVBGCWIL',
+//   secretAccessKey: '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',
+// });
+// const S3 = new AWS.S3();
+
+// // Function to upload to S3
+// const uploadToS3 = async (fileData) => {
+//   const params = {
+//     Bucket: 'performer-logo',
+//     Key: `${Date.now().toString()}.png`,
+//     Body: fileData,
+//   };
+
+//   return new Promise((resolve, reject) => {
+//     S3.upload(params, (err, data) => {
+//       if (err) {
+//         console.error('Error uploading image to S3:', err);
+//         reject(err);
+//       } else {
+//         console.log('S3 Upload Result:', data);
+//         resolve(data);
+//       }
+//     });
+//   });
+// };
+
+
+// import multer from 'multer';
+
+// AWS.config.update({
+//   region: 'eu-central-1',
+//   accessKeyId: 'AKIASHWNAZJVBVBGCWIL',
+//   secretAccessKey: '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',
+// });
+// const S3 = new AWS.S3();
+
+// // Configure Multer
+// const upload = multer({
+//   limits: {
+//     fileSize: 1024 * 1024 * 5, // Limit file size to 5MB
+//   },
+//   fileFilter: (req, file, done) => {
+//     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+//     if (allowedMimeTypes.includes(file.mimetype)) {
+//       done(null, true);
+//     } else {
+//       done(new Error('Unsupported file format. Only JPEG, PNG, and JPG formats are allowed.'), false);
+//     }
+//   },
+// });
+
+// // Function to upload to S3
+// const uploadToS3 = (fileData) => {
+//   const params = {
+//     Bucket: 'performer-logo',
+//     Key: `${Date.now().toString()}.png`,
+//     Body: fileData,
+//   };
+
+//   return new Promise((resolve, reject) => {
+//     S3.upload(params, (err, data) => {
+//       if (err) {
+//         console.error('Error uploading image to S3:', err);
+//         reject(err);
+//       } else {
+//         console.log('S3 Upload Result:', data);
+//         resolve(data);
+//       }
+//     });
+//   });
+// };
+
+// // Assuming newperformerseq is correctly imported
+// async function updateOne(query, body) {
+//   try {
+//     // Check if the body contains an updated image
+//     if (body.image) {
+//       // Upload the new image to S3
+//       const s3UploadResult = await uploadToS3(body.image);
+//       console.log("Image uploaded to S3:", s3UploadResult);
+
+//       // Update the ProfileImage field in the body with the new S3 upload location
+//       body.ProfileImage = s3UploadResult.Location;
+//     }
+
+//     // Perform the update operation
+//     const result = await newperformerseq.update(body, {
+//       where: {
+//         ...query
+//       }
+//     });
+
+//     console.log("Update result:", result);
+
+//     return result;
+//   } catch (error) {
+//     console.error('Error updating performer:', error);
+//     throw new Error('An error occurred while updating the performer.');
+//   }
+// }
+
 
 
 async function create(req, res) {
@@ -159,6 +309,9 @@ async function updateOne(query,body){
         }
     })
 }
+
+
+
 
 
 // repository.js

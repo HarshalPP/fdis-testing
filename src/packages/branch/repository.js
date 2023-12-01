@@ -16,8 +16,15 @@ async function findOne(query) {
 }
 
 async function create(body) {
-  return (await BranchSeq.create(body)).get({ plain: true })
+  try {
+    const createdBranch = await BranchSeq.create(body);
+    return createdBranch.get({ plain: true });
+  } catch (error) {
+    console.error(`Error creating branch: ${error.message}`);
+    throw error; // Rethrow the error for the calling function to handle, if needed
+  }
 }
+
 
 async function updateOne(query, body) {
   return BranchSeq.update(body, { where: { ...query } })
@@ -38,6 +45,19 @@ const findAll = async (request) => {
     }
   })
 }
+
+
+// const findAll = async (request) => {
+//   return BranchSeq.findAndCountAll({
+//     order: [['BranchName', 'ASC']],
+//     attributes:
+//     {
+//       exclude: request.excludes,
+//       include: request.includes
+//     }
+//   })
+// }
+
 
 async function countDocuments(query) {
   return BranchSeq.count(query)

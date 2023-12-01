@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 import repo from './repository'
 import { commonLocale } from '../../locales'
+const jwt =require('jsonwebtoken')
 
 async function create(body) {
   console.log('Service',body)
@@ -21,6 +22,14 @@ async function update(id,body) {
   console.log(id,body)
     return show(id)
 }
+
+
+async function auth(body) {
+  console.log(body);
+  return repo.login(body)
+}
+
+
 
 // async function updatedata(id,body) {
 //   await repo.updatedata(id,body)
@@ -109,6 +118,7 @@ export default {
   showww,
   updatedata,
   deleteRecorddata,
-  UpdatePass
+  UpdatePass,
+  auth
   
 }

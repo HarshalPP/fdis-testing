@@ -47,6 +47,13 @@ async function CategoryById(id) {
 }
 
 
+async function webdata(id) {
+  return await repo.webdata(id);
+}
+
+
+
+
 async function feedback(query,body) {
   return repo.feedback(query,body)
 }
@@ -129,7 +136,8 @@ export default {
   logout,
   index5,
   feedback,
-  finddata
+  finddata,
+  webdata
 
 
 }

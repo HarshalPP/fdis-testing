@@ -39,6 +39,22 @@ async function  CategoryById(req, res) {
   const [error, result] = await to(service.CategoryById(req.params.id))
   return handleResponse(error, result, req, res)
 }
+
+async function webdata(req, res) {
+  try {
+    const [error, result] = await to(service.webdata(req.params.id));
+    handleResponse(error, result, req, res);
+  } catch (error) {
+    // Handle unexpected errors (e.g., syntax errors, etc.)
+    console.error('Unexpected error:', error);
+    res.status(500).json({
+      error: 'An unexpected error occurred while processing the request',
+    });
+  }
+}
+
+
+
 async function  Areaname(req, res) {
   const [error, result] = await to(service.Areaname(req.params.id))
   return handleResponse(error, result, req, res)
@@ -133,7 +149,8 @@ export default {
    logout,
    index5,
    feedback,
-   finddata
+   finddata,
+   webdata
   
 
 }

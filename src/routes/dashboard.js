@@ -28,8 +28,10 @@ import area from '../packages/area/routeAdmin'
 import user from '../packages/user/routeAdmin'
 import sendgrid from '../packages/sendgrid/routeadmin'
 import newPerformer from '../packages/newPerformer/routeAdmin'
-
+import loginauth from '../packages/login.auth/routeAdmin'
 const api = Router();
+
+api.use('/login.auth', loginauth)
 
 api.use('*', authenticator)
 
